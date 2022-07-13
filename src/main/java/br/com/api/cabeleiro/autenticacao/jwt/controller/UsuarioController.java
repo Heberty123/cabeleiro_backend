@@ -5,6 +5,8 @@ import br.com.api.cabeleiro.autenticacao.jwt.model.UsuarioModel;
 import br.com.api.cabeleiro.autenticacao.jwt.repository.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -25,6 +27,23 @@ public class UsuarioController {
     @GetMapping("/listarTodos")
     public ResponseEntity<List<UsuarioModel>> listarTodos() {
         return ResponseEntity.ok(repository.findAll());
+    }
+
+    @GetMapping("/userAtual")
+    public void UserAtual() {
+
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String nome;
+
+        if (principal instanceof UserDetails) {
+            nome = ((UserDetails)principal).getUsername();
+        } else {
+            nome = principal.toString();
+        }
+
+        System.out.println("nome usuário logado é: " + nome);
     }
 
     @PostMapping("/salvar")
