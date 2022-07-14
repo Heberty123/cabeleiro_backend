@@ -5,6 +5,7 @@ import br.com.api.cabeleiro.autenticacao.jwt.model.UsuarioModel;
 import br.com.api.cabeleiro.autenticacao.jwt.repository.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,41 +31,22 @@ public class UsuarioController {
     }
 
     @GetMapping("/userAtual")
-    public void UserAtual() {
+    public ResponseEntity<UsuarioModel> UserAtual(Authentication authentication) {
 
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<UsuarioModel> user = repository.findByEmail(authentication.getName());
 
-        String nome;
-
-        if (principal instanceof UserDetails) {
-            nome = ((UserDetails)principal).getUsername();
-        } else {
-            nome = principal.toString();
-        }
-
-        System.out.println("nome usuário logado é: " + nome);
+        return ResponseEntity.ok(user.get());
     }
 
     @PostMapping("/salvar")
     public ResponseEntity<UsuarioModel> salvar(@RequestBody UsuarioModel usuario) {
+
+        if(repository.existsEmail(usuario.getEmail()) != null)
+            return ResponseEntity.status(409).header("Erro", "email Already exists").build();
+
         usuario.setPassword(encoder.encode(usuario.getPassword()));
         return ResponseEntity.ok(repository.save(usuario));
     }
 
-    @GetMapping("/validarSenha")
-    public ResponseEntity<Boolean> validarSenha(@RequestParam String login,
-                                                @RequestParam String password) {
-
-        Optional<UsuarioModel> optUsuario = repository.findByLogin(login);
-        if (optUsuario.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
-        }
-
-        UsuarioModel usuario = optUsuario.get();
-        boolean valid = encoder.matches(password, usuario.getPassword());
-
-        HttpStatus status = (valid) ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
-        return ResponseEntity.status(status).body(valid);
-    }
 }

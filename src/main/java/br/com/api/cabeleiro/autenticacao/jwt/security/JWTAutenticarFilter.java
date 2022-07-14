@@ -20,7 +20,6 @@ import java.util.Date;
 
 public class JWTAutenticarFilter extends UsernamePasswordAuthenticationFilter {
 
-    public static final int TOKEN_EXPIRACAO = 600_000_000;
     public static final String TOKEN_SENHA = "ee882c44-4817-4cb3-9936-a31567a0eb6e";
     private final AuthenticationManager authenticationManager;
 
@@ -37,7 +36,7 @@ public class JWTAutenticarFilter extends UsernamePasswordAuthenticationFilter {
             UsuarioModel usuario = new ObjectMapper().readValue(request.getInputStream(), UsuarioModel.class);
 
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    usuario.getLogin(),
+                    usuario.getEmail(),
                     usuario.getPassword(),
                     new ArrayList<>()
             ));
@@ -61,7 +60,7 @@ public class JWTAutenticarFilter extends UsernamePasswordAuthenticationFilter {
 
         String token = JWT.create().
                 withSubject(usuarioData.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + TOKEN_EXPIRACAO))
+                .withExpiresAt(new Date(System.currentTimeMillis() + (3 * 3600000)))
                 .sign(Algorithm.HMAC512(TOKEN_SENHA));
 
         response.getWriter().write(token);
