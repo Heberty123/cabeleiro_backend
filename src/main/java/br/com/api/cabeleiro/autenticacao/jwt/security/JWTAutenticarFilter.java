@@ -1,5 +1,6 @@
 package br.com.api.cabeleiro.autenticacao.jwt.security;
 
+import br.com.api.cabeleiro.ExceptionConfig.Exceptions.FalhaAutenticacaoUsuario;
 import br.com.api.cabeleiro.autenticacao.jwt.data.DetalheUsuarioData;
 import br.com.api.cabeleiro.autenticacao.jwt.model.UsuarioModel;
 import com.auth0.jwt.JWT;
@@ -25,6 +26,7 @@ public class JWTAutenticarFilter extends UsernamePasswordAuthenticationFilter {
 
     public JWTAutenticarFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
+        setFilterProcessesUrl("/api/usuario/login");
     }
 
     @Override
@@ -42,7 +44,7 @@ public class JWTAutenticarFilter extends UsernamePasswordAuthenticationFilter {
             ));
 
         } catch (IOException e) {
-            throw new RuntimeException("Falha ao autenticar usuario: ", e);
+            throw new FalhaAutenticacaoUsuario("Falha ao autenticar usuario");
         }
 
     }

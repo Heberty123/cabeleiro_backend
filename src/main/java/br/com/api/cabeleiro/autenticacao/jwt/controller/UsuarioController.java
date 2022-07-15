@@ -1,15 +1,15 @@
 package br.com.api.cabeleiro.autenticacao.jwt.controller;
 
 
+import br.com.api.cabeleiro.ExceptionConfig.Exceptions.ConflictEmailAlreadyExist;
 import br.com.api.cabeleiro.autenticacao.jwt.model.UsuarioModel;
 import br.com.api.cabeleiro.autenticacao.jwt.repository.UsuarioRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,13 +40,17 @@ public class UsuarioController {
     }
 
     @PostMapping("/salvar")
-    public ResponseEntity<UsuarioModel> salvar(@RequestBody UsuarioModel usuario) {
+    public ResponseEntity<UsuarioModel> salvar(@RequestBody @Valid UsuarioModel usuario) {
 
-        if(repository.existsEmail(usuario.getEmail()) != null)
-            return ResponseEntity.status(409).header("Erro", "email Already exists").build();
+        if(repository.existsByEmail(usuario.getEmail()))
+            throw new ConflictEmailAlreadyExist(usuario.getEmail());
+
+
 
         usuario.setPassword(encoder.encode(usuario.getPassword()));
         return ResponseEntity.ok(repository.save(usuario));
     }
+
+
 
 }
