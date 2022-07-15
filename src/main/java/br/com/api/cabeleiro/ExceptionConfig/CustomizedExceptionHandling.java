@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class CustomizedExceptionHandling extends ResponseEntityExceptionHandler {
+public class CustomizedExceptionHandling {
 
     @ExceptionHandler(ConflictEmailAlreadyExist.class)
     public ResponseEntity<Object> handleExceptionsCPFUnique(ConflictEmailAlreadyExist exception, WebRequest webRequest) {
