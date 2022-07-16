@@ -27,4 +27,8 @@ public class UsuarioModel {
     @NotBlank(message = "Senha não pode ser null")
     private String password;
 
+    private String VerificationCode;
+
+    private boolean enable;
+
 }

@@ -47,6 +47,6 @@ public class DetalheUsuarioData implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return usuario.orElse(new UsuarioModel()).isEnable();
     }
 }
